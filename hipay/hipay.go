@@ -17,6 +17,7 @@ type Hipay interface {
 	CheckoutGet(checkoutId string) (HipayCheckoutGetResponse, error)
 	PaymentGet(paymentId string) (HipayPaymentGetResponse, error)
 	PaymentCorrection(paymentId string) (HipayPaymentCorrectionResponse, error)
+	PaymentCancel(paymentId string) (HipayPaymentCancelResponse, error)
 	Statement(date string) (HipayStatementResponse, error)
 }
 
@@ -119,5 +120,28 @@ func (h *hipay) Statement(date string) (HipayStatementResponse, error) {
 	if response.Code != 1 {
 		return HipayStatementResponse{}, errors.New(response.Description + ": " + response.Details[0].Field + " - " + response.Details[0].Issue)
 	}
+	return response, nil
+}
+
+func (h *hipay) PaymentCancel(paymentId string) (HipayPaymentCancelResponse, error) {
+	if paymentId == "" {
+		return HipayPaymentCancelResponse{}, errors.New("PaymentID cannot be empty")
+	}
+	body := HipayPaymentCancelRequest{
+		EntityID:  h.entityId,
+		PaymentID: paymentId,
+	}
+	res, err := h.httpRequest(body, HipayPaymentCancel, "")
+	if err != nil {
+		return HipayPaymentCancelResponse{}, err
+	}
+	var response HipayPaymentCancelResponse
+	if err := json.Unmarshal(res, &response); err != nil {
+		return HipayPaymentCancelResponse{}, err
+	}
+	if response.Code != 1 {
+		return HipayPaymentCancelResponse{}, errors.New(response.Description + ": " + response.Details[0].Field + " - " + response.Details[0].Issue)
+	}
+
 	return response, nil
 }
