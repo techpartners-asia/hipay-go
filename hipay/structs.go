@@ -114,4 +114,16 @@ type (
 		PaymentDesc  string  `json:"paymentDesc"`
 		ReturnAmount float64 `json:"returnAmount"`
 	}
+	HipayPaymentCancelRequest struct {
+		EntityID  string `json:"entityId"`
+		PaymentID string `json:"paymentId"`
+	}
+
+	HipayPaymentCancelResponse struct {
+		Code        int64      `json:"code"`
+		Description string     `json:"description"`
+		PaymentID   string     `json:"paymentId,omitempty"`
+		CancelledAt string     `json:"cancelledAt,omitempty"`
+		Details     []*Details `json:"details,omitempty"`
+	}
 )

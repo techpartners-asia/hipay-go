@@ -31,6 +31,10 @@ var (
 		Url:    "/pos/statement",
 		Method: http.MethodPost,
 	}
+	HipayPaymentCancel = utils.API{
+		Url:    "/payment/cancel",
+		Method: http.MethodPost,
+	}
 )
 
 func (h *hipay) httpRequest(body interface{}, api utils.API, urlExt string) (response []byte, err error) {
