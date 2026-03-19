@@ -1,62 +1,44 @@
 package hipay
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
-
-	"github.com/techpartners-asia/hipay-go/utils"
 )
 
+// API endpoint constants. See: https://developers.hipay.mn
 var (
-	HipayCheckout = utils.API{
+	// HipayCheckout creates a checkout session (E-Commerce).
+	HipayCheckout = API{
 		Url:    "/checkout",
 		Method: http.MethodPost,
 	}
-	HipayCheckoutGet = utils.API{
+	// HipayCheckoutGet retrieves checkout status (E-Commerce).
+	HipayCheckoutGet = API{
 		Url:    "/checkout/get/",
 		Method: http.MethodGet,
 	}
-	HipayPaymentGet = utils.API{
+	// HipayCheckoutCancel cancels a checkout (E-Commerce).
+	HipayCheckoutCancel = API{
+		Url:    "/checkout/cancel",
+		Method: http.MethodPost,
+	}
+	// HipayPaymentGet retrieves payment details (Үндсэн API).
+	HipayPaymentGet = API{
 		Url:    "/payment/get/",
 		Method: http.MethodGet,
 	}
-	HipayPaymentCorrection = utils.API{
+	// HipayPaymentCorrection performs a payment correction (Pos).
+	HipayPaymentCorrection = API{
 		Url:    "/pos/correction",
 		Method: http.MethodPost,
 	}
-	HipayStatement = utils.API{
-		Url:    "/pos/statement",
-		Method: http.MethodPost,
-	}
-	HipayPaymentCancel = utils.API{
+	// HipayPaymentCancel cancels a payment (Үндсэн API).
+	HipayPaymentCancel = API{
 		Url:    "/payment/cancel",
 		Method: http.MethodPost,
 	}
+	// HipayStatement retrieves statement data for a given date (Pos).
+	HipayStatement = API{
+		Url:    "/pos/statement",
+		Method: http.MethodPost,
+	}
 )
-
-func (h *hipay) httpRequest(body interface{}, api utils.API, urlExt string) (response []byte, err error) {
-
-	var requestByte []byte
-	var requestBody *bytes.Reader
-	if body == nil {
-		requestBody = bytes.NewReader(nil)
-	} else {
-		requestByte, _ = json.Marshal(body)
-		requestBody = bytes.NewReader(requestByte)
-	}
-
-	req, _ := http.NewRequest(api.Method, h.endpoint+api.Url+urlExt, requestBody)
-	req.Header.Add("Content-Type", utils.HttpContent)
-	req.Header.Add("Authorization", "Bearer "+h.token)
-
-	res, err := http.DefaultClient.Do(req)
-
-	response, _ = io.ReadAll(res.Body)
-	if res.StatusCode != 200 {
-		return nil, errors.New(string(response))
-	}
-	return
-}
